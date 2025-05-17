@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Double API Demo</title>
+  <meta charset="UTF-8">
+</head>
+<body>
+  <h2>Double an Integer (via Flask API)</h2>
+  <label>Enter an integer: <input id="input" type="number" /></label>
+  <div>
+    <strong>Result:</strong> <span id="output"></span>
+  </div>
+  <script>
+    const apiUrl = 'https://curvy-comics-beam.loca.lt/double'; // Replace with your actual URL
+
+    document.getElementById('input').addEventListener('input', async function() {
+      const val = this.value;
+      const output = document.getElementById('output');
+      if (val === '') {
+        output.textContent = '';
+        return;
+      }
+      try {
+        const resp = await fetch(apiUrl + '?n=' + encodeURIComponent(val), {
+          headers: {
+            'bypass-tunnel-reminder': '1'
+          }
+        });
+        const text = await resp.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          output.textContent = 'Error: Server did not return JSON (possible trust page or tunnel error)';
+          return;
+        }
+        if ('result' in data) {
+          output.textContent = data.result;
+        } else {
+          output.textContent = data.error || 'Error';
+        }
+      } catch (e) {
+        output.textContent = 'Error: ' + e.message;
+      }
+    });
+  </script>
+</body>
+</html>
